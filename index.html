@@ -5,37 +5,104 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YouTube Video Idea Generator</title>
     <style>
-        /* Add your CSS styles here */
+        body {
+            background-color: #3498db; /* Blue background color */
+            color: #fff; /* White text color */
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1, p {
+            text-align: center;
+        }
+        form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #2980b9; /* Blue button color */
+            color: #fff; /* White text color */
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #1a5276; /* Darker blue on hover */
+        }
+        #ideasContainer {
+            display: none;
+        }
+        #checkChannel {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            font-size: 12px;
+            color: #fff; /* White text color */
+        }
+        #checkChannel a {
+            color: #fff; /* White link color */
+        }
+        #checkChannel a:hover {
+            color: #ccc; /* Light gray on hover */
+        }
     </style>
 </head>
 <body>
     <h1>YouTube Video Idea Generator</h1>
+    <p>This website helps you come up with video ideas for your YouTube channel! Simply enter a title or topic from one of your videos, and the website will generate a similar idea for you.</p>
     <form id="videoForm">
-        <label for="videoTitle">Enter YouTube Video Title:</label><br>
+        <label for="videoTitle">Enter YouTube Video Title or Topic:</label><br>
         <input type="text" id="videoTitle" name="videoTitle" placeholder="Example: How to Bake a Cake" required><br><br>
-        <button type="button" onclick="generateIdeas()">Generate Ideas</button>
+        <label for="ideaCount">Number of Ideas:</label>
+        <select id="ideaCount">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select><br><br>
+        <button type="button" onclick="generateIdeas()">Generate Idea(s)</button>
     </form>
 
-    <div id="ideasContainer" style="display: none;">
-        <h2>Generated Video Ideas:</h2>
+    <div id="ideasContainer">
+        <h2>Generated Video Idea(s):</h2>
         <ul id="ideasList"></ul>
     </div>
 
+<div id="checkChannel">
+    <p>If you have a moment, it would mean a lot to me if you could check out my channel:</p>
+    <a href="https://www.youtube.com/channel/UCdVsw0QON4gp7ugBntTFdlw" target="_blank">My YouTube Channel</a>
+</div>
+
+
     <script>
-        // Function to fetch video ideas based on the provided video title
+        // Function to generate ideas based on the provided video title or topic
         function generateIdeas() {
             var videoTitle = document.getElementById('videoTitle').value;
+            var ideaCount = parseInt(document.getElementById('ideaCount').value);
 
             // Construct the API request URL
-            var apiKey = 'AIzaSyCLkmk5hFnixO1vT3ounKdVnx2hXs8Mfb4';
-            var apiUrl = 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=3&q=' + encodeURIComponent(videoTitle) + '&key=' + apiKey;
+            var apiKey = 'YOUR_YOUTUBE_API_KEY';
+            var apiUrl = 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=' + encodeURIComponent(videoTitle) + '&type=video&key=' + apiKey;
 
             // Make the API request
             fetch(apiUrl)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch data');
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    // Extract video titles from the API response and display them as ideas
-                    var ideas = data.items.map(item => item.snippet.title);
+                    // Extract video titles from the API response
+                    var videoTitles = data.items.map(item => item.snippet.title);
+                    // Generate ideas based on the video titles
+                    var ideas = [];
+                    for (var i = 0; i < ideaCount; i++) {
+                        var randomIndex = Math.floor(Math.random() * videoTitles.length);
+                        var idea = videoTitles[randomIndex];
+                        ideas.push(idea);
+                    }
                     displayIdeas(ideas);
                 })
                 .catch(error => {
@@ -44,7 +111,7 @@
                 });
         }
 
-        // Function to display generated ideas on the webpage
+        // Function to display the generated ideas on the webpage
         function displayIdeas(ideas) {
             var ideasList = document.getElementById('ideasList');
             ideasList.innerHTML = '';
@@ -58,3 +125,4 @@
     </script>
 </body>
 </html>
+
